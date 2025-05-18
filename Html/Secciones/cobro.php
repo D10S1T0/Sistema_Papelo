@@ -1,5 +1,16 @@
 <?php
-   include_once(__DIR__ . '/../../Modelos/categoriaModelo.php');
+
+    include_once(__DIR__ . '/../../Modelos/categoriaModelo.php');
+    require_once __DIR__ . '/../../Modelos/ProductoModelo.php';
+    require_once __DIR__ . '/../../Controladores/controlCobro.php';
+    include '../Includes/conexion.php';
+    $puesto = isset($_SESSION['puesto']) ? strtolower($_SESSION['puesto']) : '';
+
+    $url = match ($puesto) {
+        'gerente' => "Location: ../Html/dashboardAdmi.php?seccion=cobro",
+        'cajero'  => "Location: ../Html/dashboardCajero.php?seccion=cobro",
+        default   => "Location: ../Html/Login.php"
+    };
     //Codigo spaguetti ;v
 	$ticket = $_SESSION['ticket'] ?? [];
     $productoAgregado = null;
@@ -40,13 +51,6 @@
         session_start();
     }
 
-    $puesto = isset($_SESSION['puesto']) ? strtolower($_SESSION['puesto']) : '';
-
-    $url = match ($puesto) {
-        'gerente' => "Location: ../Html/dashboardAdmi.php?seccion=cobro",
-        'cajero'  => "Location: ../Html/dashboardCajero.php?seccion=cobro",
-        default   => "Location: ../Html/Login.php"
-    };
 ?>
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">

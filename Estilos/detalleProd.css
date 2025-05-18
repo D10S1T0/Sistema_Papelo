@@ -134,3 +134,29 @@ body {
     text-align: center;
     color: rgba(255,255,255,0.7);
 }
+
+		.rating-stars {
+			display: inline-flex;
+			gap: 5px;
+		}
+
+		.star-button {
+			background: none;
+			border: none;
+			font-size: 1.8rem;
+			color: #ccc;
+			cursor: pointer;
+			padding: 0;
+			transition: color 0.2s;
+		}
+
+		.star-button.active {
+			color: gold;
+		}
+
+		.rating-stars:hover .star-button {
+			color: #ccc;
+		}
+
+
+	

@@ -27,7 +27,7 @@
             } elseif ($puesto === 'cajero') {
                 header("Location: ../Html/dashboardCajero.php");
             } else {
-                header("Location: ../Html/dashboard_empleado.php");
+                header("Location: ../Html/home.php.php");
             }
             exit();
         }
@@ -40,7 +40,7 @@
             $_SESSION['usuario'] = $visitante['nombre'];
             $_SESSION['tipo'] = 'visitante';
             $_SESSION['idVisitante'] = $visitante['idVisitante'];
-            header("Location: ../Controladores/controlCatalogo.php");
+            header("Location: ../Html/home.php");
             exit();
         }
 

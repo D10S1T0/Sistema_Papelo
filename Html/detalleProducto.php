@@ -1,10 +1,24 @@
+<?php
+session_start();
+
+$idVisitante = $_SESSION['idVisitante'] ?? null;
+$idProducto = $producto['idProducto'];
+
+//obtener la calificacino del visitante
+$calificacionVisitante = 0;
+if ($idVisitante) {
+    $stmt = $conexion->prepare("SELECT calificacion FROM Calificaciones WHERE idProducto = ? AND idVisitante = ?");
+    $stmt->execute([$idProducto, $idVisitante]);
+    $calificacionVisitante = $stmt->fetchColumn() ?: 0;
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalle del Producto | Papelo</title>
-    <link rel="stylesheet" href="../Estilos/DetalleProducto.css">
+    <link rel="stylesheet" href="../Estilos/DetalleProd.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
 
@@ -18,7 +32,7 @@
             <div class="product-container row">
                 <div class="col-md-6 product-image">
                     <div class="text-center">
-                        <?php if (!empty($producto['imagen'])): ?><!--decoficiar en base64 pa la img-->
+                        <?php if (!empty($producto['imagen'])): ?>
                             <img src="data:image/jpeg;base64,<?= base64_encode($producto['imagen']) ?>" class="img-fluid rounded" style="max-height: 500px; width: auto; object-fit: contain;">
                         <?php else: ?>
                             <img src="../Recursos/Imgs/default.jpg" class="img-fluid rounded" alt="Sin imagen">
@@ -43,17 +57,33 @@
                     </div>
                     
                     <div class="mb-4">
-                        <strong>Calificación:</strong>
+                        <strong>Calificación promedio:</strong>
                         <span class="rating ms-2">
                             <?php
                             $rating = $producto['promedio'] ?? 0;
                             for ($i = 1; $i <= 5; $i++) {
-                                echo $i <= $rating ? '<i class="bi bi-star-fill"></i>' : '<i class="bi bi-star"></i>';
+                                echo $i <= $rating ? '<i class="bi bi-star-fill star-button active"></i>' : '<i class="bi bi-star-fill star-button"></i>';
                             }
                             ?>
                         </span>
                         <span class="text-muted">(<?= $rating ?> de 5)</span>
                     </div>
+					
+					<form action="../controladores/controlCalificacion.php" method="POST" >
+						<input type="hidden" name="idProducto" value="<?= $producto['idProducto'] ?>">
+
+						<div class="rating-stars"><div class="mb-4"><strong>Tu calificación:</strong>
+							<?php for ($i = 1; $i <= 5; $i++): ?>
+								<button type="submit" name="calificacion" value="<?= $i ?>" class="star-button <?= ($i <= $calificacionVisitante) ? 'active' : '' ?>">
+									<i class="bi bi-star-fill"></i>
+								</button>
+							<?php endfor; ?>
+						</div>
+					</form>
+</div>
+
+
+					
                     <?php
                         if($producto['stock']>0){
                     ?>

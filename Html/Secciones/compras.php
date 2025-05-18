@@ -260,9 +260,6 @@
     </div>
 </div>
 
-
-
-
 <!-- modasl para nuevo proveedor -->
 <div class="modal fade" id="nuevoProveedorModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">

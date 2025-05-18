@@ -1,3 +1,7 @@
+<?php
+    header("Location: ../Sistema Papelo/Html/login.php");
+    exit;
+?>
 <!DOCTYPE html>
     <html lang="en">
     <head>

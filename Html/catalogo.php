@@ -1,3 +1,11 @@
+<?php 
+    session_start();
+    
+    if (!isset($_SESSION['usuario']) || $_SESSION['tipo'] !== 'visitante') {
+        header("Location: ../html/Login.php");
+        exit();
+    }
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>

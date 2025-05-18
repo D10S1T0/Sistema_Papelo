@@ -2,37 +2,35 @@
     require_once __DIR__ . '/../Modelos/cobroModelo.php';
     require_once __DIR__ . '/../Modelos/productoModelo.php';
 
-    //cobro pedido
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cobrarPedidoFinal'])) {
-        $idPedido = $_POST['idPedido'];
-        $efectivo = $_POST['efectivo'];
-        
-        session_start();
-        $idEmpleado = $_SESSION['idEmpleado'] ?? 1; 
+		$idPedido = $_POST['idPedido'];
+		$efectivo = $_POST['efectivo'];
+		session_start();
+		$idEmpleado = $_SESSION['idEmpleado'] ?? 1; 
 
-        $resultado = CobroModelo::cobrarPedido($idPedido, $efectivo, $idEmpleado);
-        
-        if (session_status() === PHP_SESSION_NONE) {
+		$resultado = CobroModelo::cobrarPedido($idPedido, $efectivo, $idEmpleado);
+		
+		if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
+
         $puesto = isset($_SESSION['puesto']) ? strtolower($_SESSION['puesto']) : '';
 
-        //direccionamiento por la url copiar y pegar, deberia hacerlo una funcion?? quizas.. pero ñe
         $url = match ($puesto) {
             'gerente' => "Location: ../Html/dashboardAdmi.php?seccion=cobro",
             'cajero'  => "Location: ../Html/dashboardCajero.php?seccion=cobro",
             default   => "Location: ../Html/Login.php"
         };
 
+		if (isset($resultado['error'])) {
+			header($url."&error=" . urlencode($resultado['error']));
+		} else {
+			$cambio = number_format($resultado['cambio'], 2);
+			header($url."&mensaje_cobro=1&cambio=$cambio");
+		}
+		exit;
+	}
 
-        if (isset($resultado['error'])) {
-            header($url."&error=" . urlencode($resultado['error']));//die(url);
-        } else {
-            $cambio = number_format($resultado['cambio'], 2);
-            header($url."&mensaje_cobro=1&cambio=$cambio");
-        }
-        exit;
-    }
 
     //agre producto
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['idProducto'])) {

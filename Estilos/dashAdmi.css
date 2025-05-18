@@ -92,7 +92,6 @@ body {
     border-color: #2c3e50;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .sidebar {
         left: -var(--sidebar-width);
