@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $infoProductos .= "- {$p['nombreProducto']} (Precio: {$p['precio']} MXN, Stock: {$p['stock']})\n";
     }
 
-    $apiKey = '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'; // Sustituye esto por tu API real
+    $apiKey = ''; //agregar la API here bro
     $url = 'https://openrouter.ai/api/v1/chat/completions';
 
     $data = [
