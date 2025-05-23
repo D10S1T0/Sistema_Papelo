@@ -63,5 +63,130 @@
     <?php include '../Includes/footer.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <div id="chatbot" style="position: fixed; bottom: 20px; right: 20px; width: 320px; background: #fff; border: none; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); transform: translateY(20px); opacity: 0; transition: all 0.3s ease-out; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        <div style="background:  #2c3e50; color: white; padding: 15px; border-top-left-radius: 12px; border-top-right-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-weight: 600; font-size: 16px;">
+                <i class="bi bi-robot" style="margin-right: 8px;"></i> Asistente Papelo
+            </div>
+            <button id="minimizeChat" style="background: none; border: none; color: white; cursor: pointer; font-size: 16px;">
+                <i class="bi bi-dash"></i>
+            </button>
+        </div>
+        <div id="chatMensajes" style="height: 250px; overflow-y: auto; padding: 15px; font-size: 14px; background: #f9f9f9; display: flex; flex-direction: column; gap: 12px;">
+            <div style="align-self: flex-start; max-width: 80%; background: #3498db; padding: 10px 12px; border-radius: 12px 12px 12px 0; color: #333; line-height: 1.4;">
+                <p style ="color: #fff;">¡Hola! Soy tu asistente de Papelo. ¿En qué puedo ayudarte hoy?</p>
+            </div>
+        </div>
+        <div style="padding: 12px; border-top: 1px solid #eee; background: white; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; display: flex; gap: 8px;">
+            <input type="text" id="inputMensaje" placeholder="Escribe tu mensaje..." style="flex: 1; padding: 10px 12px; border: 1px solid #ddd; border-radius: 20px; outline: none; transition: border 0.3s; font-size: 14px;" onfocus="this.style.borderColor='#3498db'">
+            <button onclick="enviarMensaje()" style="background: #3498db; color: white; border: none; border-radius: 20px; padding: 0 16px; cursor: pointer; transition: background 0.3s; display: flex; align-items: center; gap: 5px;">
+                <i class="bi bi-send-fill" style="font-size: 12px;"></i> Enviar
+            </button>
+        </div>
+    </div>
+
+    <script>
+        setTimeout(() => {
+            document.getElementById('chatbot').style.transform = 'translateY(0)';
+            document.getElementById('chatbot').style.opacity = '1';
+        }, 500);
+
+        document.getElementById('minimizeChat').addEventListener('click', function() {
+            const chat = document.getElementById('chatbot');
+            const mensajes = document.getElementById('chatMensajes');
+            
+            if (mensajes.style.display !== 'none') {
+                mensajes.style.display = 'none';
+                chat.style.height = 'auto';
+                this.innerHTML = '<i class="bi bi-plus"></i>';
+            } else {
+                mensajes.style.display = 'flex';
+                chat.style.height = '';
+                this.innerHTML = '<i class="bi bi-dash"></i>';
+            }
+        });
+
+        function enviarMensaje() {
+            const input = document.getElementById('inputMensaje');
+            const mensaje = input.value.trim();
+            
+            if (mensaje) {
+                const chat = document.getElementById('chatMensajes');
+                chat.innerHTML += `
+                    <div style="align-self: flex-end; max-width: 80%; background: #3498db; color: white; padding: 10px 12px; border-radius: 12px 12px 0 12px; line-height: 1.4;">
+                        ${mensaje}
+                    </div>
+                `;
+                input.value = '';
+                setTimeout(() => {
+                    chat.innerHTML += `
+                        <div style="align-self: flex-start; max-width: 80%; background: #e3f2fd; padding: 10px 12px; border-radius: 12px 12px 12px 0; color: #333; line-height: 1.4;">
+                            Gracias por tu mensaje. Un agente te responderá pronto.
+                        </div>
+                    `;
+                    chat.scrollTop = chat.scrollHeight;
+                }, 800);
+                
+                chat.scrollTop = chat.scrollHeight;
+            }
+        }
+        document.getElementById('inputMensaje').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                enviarMensaje();
+            }
+        });
+    </script>
+
+    
+    <script>
+        function enviarMensaje() {
+            const input = document.getElementById('inputMensaje');
+            const mensaje = input.value.trim();
+            if (!mensaje) return;
+
+            const contenedor = document.getElementById('chatMensajes');
+
+            contenedor.innerHTML += `
+                <div style="align-self: flex-end; max-width: 80%; background: #e3f2fd; color: #333; padding: 10px 12px; border-radius: 12px 12px 0 12px; line-height: 1.4;">
+                    ${mensaje}
+                </div>
+            `;
+            contenedor.scrollTop = contenedor.scrollHeight;
+            input.value = '';
+
+            fetch('../Controladores/controlChatBot.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({mensaje})
+            })
+            .then(res => res.json())
+            .then(data => {
+                contenedor.innerHTML += `
+                    <div style="align-self: flex-start; max-width: 80%; background: #3498db; padding: 10px 12px; border-radius: 12px 12px 12px 0; color: white; line-height: 1.4;">
+                        ${data.respuesta}
+                    </div>
+                `;
+                contenedor.scrollTop = contenedor.scrollHeight;
+            })
+            .catch(error => {
+                contenedor.innerHTML += `
+                    <div style="align-self: flex-start; max-width: 80%; background: #f8d7da; padding: 10px 12px; border-radius: 12px 12px 12px 0; color: #721c24; line-height: 1.4;">
+                        Hubo un error al procesar tu mensaje. Intenta nuevamente.
+                    </div>
+                `;
+                contenedor.scrollTop = contenedor.scrollHeight;
+            });
+        }
+
+        document.getElementById('inputMensaje').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                enviarMensaje();
+            }
+        });
+    </script>
+
+
+
 </body>
 </html>
