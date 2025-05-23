@@ -4,7 +4,6 @@ session_start();
 $idVisitante = $_SESSION['idVisitante'] ?? null;
 $idProducto = $producto['idProducto'];
 
-//obtener la calificacino del visitante
 $calificacionVisitante = 0;
 if ($idVisitante) {
     $stmt = $conexion->prepare("SELECT calificacion FROM Calificaciones WHERE idProducto = ? AND idVisitante = ?");
@@ -80,45 +79,45 @@ if ($idVisitante) {
 							<?php endfor; ?>
 						</div>
 					</form>
-</div>
+                </div>
 
 
 					
-                    <?php
-                        if($producto['stock']>0){
-                    ?>
-                            <div class="d-flex align-items-center">
-                                <form action="../controladores/controlAñadirPedido.php" method="POST" class="d-flex align-items-center">
-                                    <input type="hidden" name="idProducto" value="<?= $producto['idProducto'] ?>">
-                                    <div class="input-group me-3" style="width: 120px;">
-                                        <button class="btn btn-outline-secondary" type="button" onclick="cambiarCantidad(-1)">-</button>
-                                        <input type="number" id="cantidad" name="cantidad" class="form-control text-center" value="1" min="1" max="5" required>
-                                        <button class="btn btn-outline-secondary" type="button" onclick="cambiarCantidad(1)">+</button>
-                                    </div>
-                                    <button type="submit" class="btn btn-cart"><i class="bi bi-cart-plus"></i> Añadir al carrito</button>
-                                </form>
+                <?php
+                if($producto['stock']>0){
+                ?>
+                    <div class="d-flex align-items-center">
+                        <form action="../controladores/controlAñadirPedido.php" method="POST" class="d-flex align-items-center">
+                            <input type="hidden" name="idProducto" value="<?= $producto['idProducto'] ?>">
+                            <div class="input-group me-3" style="width: 120px;">
+                                <button class="btn btn-outline-secondary" type="button" onclick="cambiarCantidad(-1)">-</button>
+                                <input type="number" id="cantidad" name="cantidad" class="form-control text-center" value="1" min="1" max="5" required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="cambiarCantidad(1)">+</button>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="background-color: #2c3e50; border-color: #2c3e50;"><i class="bi bi-cart-plus"></i> Añadir al carrito</button>
+                        </form>
 
-                                <script>
-                                    function cambiarCantidad(valor) {
-                                        const input = document.getElementById('cantidad');
-                                        let cantidad = parseInt(input.value);
-                                        if (!isNaN(cantidad)) {
-                                            cantidad += valor;
-                                            if (cantidad < 1) cantidad = 1;
-                                            if (cantidad > 5) cantidad = 5;
-                                            input.value = cantidad;
-                                        }
-                                    }
-                                </script> 
-                            </div> 
-                    <?php
-                            }else{  
-                                echo "<span class='lead'>No hay stock disponible de: {$producto['nombreProducto']} por el momento</span>";
-                            } 
-                    ?>
+                        <script>
+                            function cambiarCantidad(valor) {
+                                const input = document.getElementById('cantidad');
+                                let cantidad = parseInt(input.value);
+                                if (!isNaN(cantidad)) {
+                                    cantidad += valor;
+                                    if (cantidad < 1) cantidad = 1;
+                                    if (cantidad > 5) cantidad = 5;
+                                    input.value = cantidad;
+                                }
+                            }
+                        </script> 
+                    </div> 
+                <?php
+                }else{  
+                    echo "<span class='lead'>No hay stock disponible de: {$producto['nombreProducto']} por el momento</span>";
+                } 
+                ?>
 
-                </div>
             </div>
+        </div>
         <?php else: ?>
             <div class="alert alert-danger text-center">
                 <i class="bi bi-exclamation-triangle-fill"></i> Producto no encontrado.
