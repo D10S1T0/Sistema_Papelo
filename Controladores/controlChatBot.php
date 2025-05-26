@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $infoProductos .= "- {$p['nombreProducto']} (Precio: {$p['precio']} MXN, Stock: {$p['stock']})\n";
     }
 
-    $apiKey = ''; 
+    $apiKey = ''; //aqui va la api here
     $url = 'https://openrouter.ai/api/v1/chat/completions';
 
     $data = [
