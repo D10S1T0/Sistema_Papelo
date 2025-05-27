@@ -1,0 +1,131 @@
+--ESTE SCRIPT ES PARA CREAR LA BASE DE DATOS GestionPapeleria
+
+CREATE DATABASE GestionPapeleria;
+USE GestionPapeleria;
+ 
+--TABLA DE PUESTOS
+CREATE TABLE Puestos (
+idPuesto INT AUTO_INCREMENT PRIMARY KEY,
+   	nombrePuesto VARCHAR(100) NOT NULL,
+	salario DECIMAL(10,2)
+);
+ 
+--TABLA DE EMPLEADOS
+CREATE TABLE Empleados (
+    idEmpleado INT AUTO_INCREMENT PRIMARY KEY,
+    nombreEmpleado VARCHAR(255) NOT NULL,
+    apellidoPaterno VARCHAR(255) NOT NULL,
+    apellidoMaterno VARCHAR(255) NOT NULL,
+	fechaNacimiento DATE NOT NULL,
+	correo VARCHAR(191) UNIQUE NOT NULL,
+	pass VARCHAR(255) NOT NULL,
+	telefono VARCHAR(20),
+	idPuesto INT NOT NULL,
+    fechaContratacion DATE NOT NULL,
+	FOREIGN KEY (idPuesto) REFERENCES Puestos(idPuesto)
+);
+ 
+--TABLA DE VISITANTES
+CREATE TABLE Visitantes (
+    idVisitante INT AUTO_INCREMENT PRIMARY KEY,
+	nombre VARCHAR(255) NOT NULL,
+    apellidoPaterno VARCHAR(255) NOT NULL,
+    apellidoMaterno VARCHAR(255) NOT NULL,
+    fechaNacimiento DATE NOT NULL,
+	correo VARCHAR(191) UNIQUE NOT NULL,
+	pass VARCHAR(255) NOT NULL
+);
+ 
+--TABLA DE CATEGORIAS
+CREATE TABLE Categorias (
+    idCategoria INT AUTO_INCREMENT PRIMARY KEY,
+    nombreCategoria VARCHAR(100) NOT NULL
+);
+ 
+--TABLA DE PRODUCTOS
+CREATE TABLE Productos (
+    idProducto INT AUTO_INCREMENT PRIMARY KEY,
+    nombreProducto VARCHAR(255) NOT NULL,
+    descripcion TEXT,
+	precio DECIMAL(10,2) NOT NULL,
+	stock INT NOT NULL,
+      idCategoria INT,
+	imagen MEDIUMBLOB,
+	FOREIGN KEY (idCategoria) REFERENCES Categorias(idCategoria)
+);
+ 
+CREATE TABLE Calificaciones (
+    idCalificacion INT AUTO_INCREMENT PRIMARY KEY,
+    idProducto INT NOT NULL,
+    idVisitante INT NOT NULL,
+    calificacion INT NOT NULL CHECK (calificacion BETWEEN 1 AND 5),
+    fechaCalificacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+       FOREIGN KEY (idProducto) REFERENCES Productos(idProducto) ON DELETE CASCADE,
+    FOREIGN KEY (idVisitante) REFERENCES Visitantes(idVisitante) ON DELETE CASCADE,
+    UNIQUE (idProducto, idVisitante)
+);
+ 
+--TABLA DE VENTAS
+CREATE TABLE Ventas (
+	idVenta INT AUTO_INCREMENT PRIMARY KEY,
+    idEmpleado INT NOT NULL,
+	fecha DATE NOT NULL,
+	FOREIGN KEY (idEmpleado) REFERENCES Empleados(idEmpleado)
+);
+ 
+--TABLA DETALLESVENTAS
+CREATE TABLE DetallesVenta (
+    idDetalleVenta INT AUTO_INCREMENT PRIMARY KEY,
+	idVenta INT NOT NULL,
+    idProducto INT NOT NULL,
+	cantidad INT NOT NULL,
+	FOREIGN KEY (idVenta) REFERENCES Ventas(idVenta),
+	FOREIGN KEY (idProducto) REFERENCES Productos(idProducto)
+);
+ 
+--TABLA PROVEEDORES
+CREATE TABLE Proveedores (
+    idProveedor INT AUTO_INCREMENT PRIMARY KEY,
+    nombreProveedor VARCHAR(255) NOT NULL,
+	contacto VARCHAR(255),
+	telefono VARCHAR(20)
+);
+ 
+--TABLA COMPRAS (PEDIDOS A PROVEEDORES)
+CREATE TABLE Compras (
+	idCompra INT AUTO_INCREMENT PRIMARY KEY,
+    idEmpleado INT NOT NULL,
+    idProveedor INT NOT NULL,
+	fecha DATE NOT NULL,
+	FOREIGN KEY (idEmpleado) REFERENCES Empleados(idEmpleado),
+	FOREIGN KEY (idProveedor) REFERENCES Proveedores(idProveedor)
+);
+ 
+--TABLA DE DETALLES DE COMPRAS
+CREATE TABLE DetalleCompra (
+    idDetalleCompra INT AUTO_INCREMENT PRIMARY KEY,
+	idCompra INT NOT NULL,
+    idProducto INT NOT NULL,
+	cantidad INT NOT NULL,
+	FOREIGN KEY (idCompra) REFERENCES Compras(idCompra),
+	FOREIGN KEY (idProducto) REFERENCES Productos(idProducto)
+);
+ 
+--TABLA DE PEDIDOS (REALIZADOS POR VISITANTES)
+CREATE TABLE Pedidos (
+	idPedido INT AUTO_INCREMENT PRIMARY KEY,
+    idVisitante INT NOT NULL,
+	fecha DATE NOT NULL,
+	estado ENUM('Pendiente', 'Entregado', 'Cancelado') NOT NULL,
+	FOREIGN KEY (idVisitante) REFERENCES Visitantes(idVisitante)
+);
+ 
+--TABLA DE DETALLES DE PEDIDOS
+CREATE TABLE DetallePedido (
+    idDetallePedido INT AUTO_INCREMENT PRIMARY KEY,
+	idPedido INT NOT NULL,
+    idProducto INT NOT NULL,
+	cantidad INT NOT NULL,
+	FOREIGN KEY (idPedido) REFERENCES Pedidos(idPedido),
+	FOREIGN KEY (idProducto) REFERENCES Productos(idProducto)
+);
