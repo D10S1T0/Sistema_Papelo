@@ -52,7 +52,7 @@ function agregarNuevoEmpleado($conexion, $datos) {
 
     function obtenerEmpleados($conexion) {
         $sql = "SELECT e.idEmpleado, e.nombreEmpleado, e.apellidoPaterno, e.apellidoMaterno, e.correo, e.telefono, 
-                       e.fechaContratacion, e.fechaNacimiento, e.idPuesto, p.nombrePuesto 
+                       e.fechaContratacion, e.fechaNacimiento, e.pass, e.idPuesto, p.nombrePuesto 
                 FROM Empleados e 
                 JOIN Puestos p ON e.idPuesto = p.idPuesto
                 ORDER BY e.idEmpleado ASC";
@@ -85,6 +85,7 @@ function editarEmpleado($conexion, $datos) {
                     fechaContratacion = :fechaContratacion,
                     correo = :correo,
                     telefono = :telefono,
+                    pass = :pass,
                     idPuesto = :idPuesto
                 WHERE idEmpleado = :idEmpleado";
     
@@ -97,6 +98,7 @@ function editarEmpleado($conexion, $datos) {
             ':fechaContratacion' => $datos['fechaContratacion'],
             ':correo' => $datos['correo'],
             ':telefono' => $datos['telefono'],
+            ':pass' => $datos['pass'],
             ':idPuesto' => $datos['idPuesto'],
             ':idEmpleado' => $datos['idEmpleado']
         ]);

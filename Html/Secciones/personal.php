@@ -228,6 +228,10 @@ $empleados = obtenerEmpleados($conexion);
                         <input type="tel" class="form-control" name="telefono" id="editarTelefono" required>
                     </div>
                     <div class="col-md-6">
+                            <label class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" name="pass" id="editarPass" required>
+                        </div>
+                    <div class="col-md-6">
                         <label class="form-label">Puesto</label>
                         <select class="form-select" name="idPuesto" id="editarIdPuesto" required>
                             <option value="">Seleccionar puesto</option>
@@ -256,6 +260,7 @@ $empleados = obtenerEmpleados($conexion);
             document.getElementById('editarFechaNacimiento').value = boton.dataset.fechaNacimiento;
             document.getElementById('editarFechaContratacion').value = boton.dataset.fechaContratacion;
             document.getElementById('editarCorreo').value = boton.dataset.correo;
+            document.getElementById('editarPass').value = boton.dataset.pass;
             document.getElementById('editarTelefono').value = boton.dataset.telefono;
             document.getElementById('editarIdPuesto').value = boton.dataset.idpuesto;
             new bootstrap.Modal(document.getElementById('modalEditarEmpleado')).show();
