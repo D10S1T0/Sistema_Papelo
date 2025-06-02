@@ -2,8 +2,7 @@
     if (!isset($_SESSION['usuario']) || $_SESSION['tipo'] !== 'visitante') {
         header("Location: ../html/Login.php");
         exit();
-    }
-	
+    }	
 ?>
 
 <!DOCTYPE html>
@@ -81,7 +80,7 @@
                     </div>
 
                     <div class="summary-row total">
-                        <span>Total (iVA 16%):</span>
+                        <span>Total (IVA 16%):</span>
                         <span>$<?= number_format(($total * 0.16)+$total, 2) ?></span> <!-- con 10% de impuesto, si aplica -->
                     </div>
 
