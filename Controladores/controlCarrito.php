@@ -2,6 +2,10 @@
     require_once '../Includes/conexion.php';
     require_once '../Modelos/PedidoModelo.php';
     session_start();
+	
+	
+	
+
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['idProducto']) && isset($_SESSION['idVisitante'])) {
         $idProducto = $_POST['idProducto'];
@@ -9,12 +13,15 @@
 
         eliminarProductoDeCarrito($conexion, $idVisitante, $idProducto);
         
+		
         header("Location: ../Controladores/controlCarrito.php");
         exit();
     }
 
     $idVisitante = $_SESSION['idVisitante']; 
 
+	cancelarPedidosVencidos($conexion, $idVisitante);
+	
     $carrito = obtenerCarritoPorVisitante($conexion, $idVisitante);
 
     $carritoEntregado = obtenerCarritoPorVisitanteEntregado($conexion, $idVisitante);

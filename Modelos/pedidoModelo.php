@@ -1,5 +1,4 @@
-<?php
-    
+<?php   
     function obtenerCarritoPorVisitante($conexion, $idVisitante) {
         $sql = "SELECT 
                     p.idProducto,
@@ -19,6 +18,7 @@
     }
 
     function obtenerCarritoPorVisitanteEntregado($conexion, $idVisitante) {
+
         $sql = "SELECT 
                     p.idProducto,
                     p.nombreProducto,
@@ -67,6 +67,45 @@
             $stmtEliminar->execute();
         }
     }
+	
+	function cancelarPedidosVencidos($conexion, $idVisitante) {
+    try {
+        $sql = "SELECT idPedido FROM pedidos 
+                WHERE estado = 'Pendiente'
+                AND fecha <= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+                AND idVisitante = ?";
+        $stmt = $conexion->prepare($sql);
+        $stmt->execute([$idVisitante]);
+        $pedidos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        if (count($pedidos) > 0) {
+            foreach ($pedidos as $pedido) {
+                $idPedido = $pedido['idPedido'];
+
+                $sqlDetalles = "SELECT idProducto, cantidad FROM DetallePedido WHERE idPedido = ?";
+                $stmtDetalles = $conexion->prepare($sqlDetalles);
+                $stmtDetalles->execute([$idPedido]);
+                $detalles = $stmtDetalles->fetchAll(PDO::FETCH_ASSOC);
+
+                foreach ($detalles as $detalle) {
+                    $sqlUpdate = "UPDATE Productos SET stock = stock + ? WHERE idProducto = ?";
+                    $stmtUpdate = $conexion->prepare($sqlUpdate);
+                    $stmtUpdate->execute([$detalle['cantidad'], $detalle['idProducto']]);
+                }
+
+                $sqlCancelar = "UPDATE Pedidos SET estado = 'Cancelado' WHERE idPedido = ?";
+                $stmtCancelar = $conexion->prepare($sqlCancelar);
+                $stmtCancelar->execute([$idPedido]);
+            }
+
+            header("Location: ../Controladores/controlCarrito.php?mensaje=pedido_cancelado");
+            exit();
+        }
+
+    } catch (PDOException $e) {
+        echo("Error al cancelar pedidos vencidos: " . $e->getMessage());
+        die();
+    }
+}
 
 ?>

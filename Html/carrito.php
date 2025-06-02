@@ -3,6 +3,7 @@
         header("Location: ../html/Login.php");
         exit();
     }
+	
 ?>
 
 <!DOCTYPE html>
@@ -25,6 +26,16 @@
                 <div class="cart-container">
                     <h2 class="cart-title"><i class="bi bi-cart"></i> Carrito de <?php echo $_SESSION['usuario']?></h2>
                     
+					<?php if (isset($_GET['mensaje'])): ?>
+						<?php if ($_GET['mensaje'] === 'pedido_cancelado'): ?>
+							<div class="alert alert-warning alert-dismissible fade show" role="alert">
+								Tu pedido fue cancelado automáticamente por falta de pago presencial.
+								<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+							</div>
+						<?php endif; ?>
+					<?php endif; ?>
+
+					
                     <?php
                         //productos por idProducto
                         $productosAgrupados = [];
@@ -70,7 +81,7 @@
                     </div>
 
                     <div class="summary-row total">
-                        <span>Total (IVA 16%):</span>
+                        <span>Total (iVA 16%):</span>
                         <span>$<?= number_format(($total * 0.16)+$total, 2) ?></span> <!-- con 10% de impuesto, si aplica -->
                     </div>
 
