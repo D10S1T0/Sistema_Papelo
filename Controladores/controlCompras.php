@@ -15,10 +15,21 @@
 
         $resultado = ComprasModelo::registrarProveedor($conexion, $nombreProveedor, $contacto, $telefono);
 
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $puesto = isset($_SESSION['puesto']) ? strtolower($_SESSION['puesto']) : '';
+
+        $url = match ($puesto) {
+            'gerente' => "Location: ../Html/dashboardAdmi.php?seccion=compras",
+            'cajero'  => "Location: ../Html/dashboardCajero.php?seccion=compras",
+            default   => "Location: ../Html/Login.php?"
+        };
+
         if ($resultado) {
-            header("Location: ../Html/dashboardAdmi.php?seccion=compras&mensaje_cobro=1");
+            header($url."&mensaje_cobro=1");
         } else {
-            header("Location: ../Html/dashboardAdmi.php?seccion=compras&error=1");
+            header($url."&error=1");
         }
     }
 
@@ -69,7 +80,18 @@
                 }
             }
 
-            header('Location: ../HTML/dashboardAdmi.php?seccion=compras');
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+            $puesto = isset($_SESSION['puesto']) ? strtolower($_SESSION['puesto']) : '';
+
+            $url = match ($puesto) {
+                'gerente' => "Location: ../Html/dashboardAdmi.php?seccion=compras",
+                'cajero'  => "Location: ../Html/dashboardCajero.php?seccion=compras",
+                default   => "Location: ../Html/Login.php?"
+            };
+
+            header($url);
             exit;
         }
 
@@ -79,7 +101,18 @@
             if (isset($_SESSION['productosCompra'][$id])) {
                 unset($_SESSION['productosCompra'][$id]);
             }
-            header('Location: ../HTML/dashboardAdmi.php?seccion=compras');
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+            $puesto = isset($_SESSION['puesto']) ? strtolower($_SESSION['puesto']) : '';
+
+            $url = match ($puesto) {
+                'gerente' => "Location: ../Html/dashboardAdmi.php?seccion=compras",
+                'cajero'  => "Location: ../Html/dashboardCajero.php?seccion=compras",
+                default   => "Location: ../Html/Login.php?"
+            };
+            header($url);
+
             exit;
     }
 
@@ -91,8 +124,19 @@
         if (isset($_SESSION['productosCompra'][$id]) && $cantidad > 0) {
             $_SESSION['productosCompra'][$id]['cantidad'] = $cantidad;
         }
+        
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $puesto = isset($_SESSION['puesto']) ? strtolower($_SESSION['puesto']) : '';
 
-        header('Location: ../HTML/dashboardAdmi.php?seccion=compras');
+        $url = match ($puesto) {
+            'gerente' => "Location: ../Html/dashboardAdmi.php?seccion=compras",
+            'cajero'  => "Location: ../Html/dashboardCajero.php?seccion=compras",
+            default   => "Location: ../Html/Login.php?"
+        };
+
+        header($url);
         exit;
         }
     }
@@ -136,8 +180,18 @@
 
                 $conexion->commit();
 
+                if (session_status() === PHP_SESSION_NONE) {
+                    session_start();
+                }
+                $puesto = isset($_SESSION['puesto']) ? strtolower($_SESSION['puesto']) : '';
+
+                $url = match ($puesto) {
+                    'gerente' => "Location: ../Html/dashboardAdmi.php?seccion=compras",
+                    'cajero'  => "Location: ../Html/dashboardCajero.php?seccion=compras",
+                    default   => "Location: ../Html/Login.php?"
+                };
                 
-                header("Location: ../Html/dashboardAdmi.php?seccion=compras&mensaje_cobro=2");
+                header($url."&mensaje_cobro=2");
                 exit;
 
             } catch (PDOException $e) {
@@ -153,7 +207,19 @@
         $idCompra = $_POST['idEliminarCompra'];
         if ($accion === 'eliminarCompra') {
             if (ComprasModelo::eliminarCompra($conexion, $idCompra)) {
-                header("Location: ../Html/dashboardAdmi.php?seccion=compras");
+                
+                if (session_status() === PHP_SESSION_NONE) {
+                    session_start();
+                }
+                $puesto = isset($_SESSION['puesto']) ? strtolower($_SESSION['puesto']) : '';
+
+                $url = match ($puesto) {
+                    'gerente' => "Location: ../Html/dashboardAdmi.php?seccion=compras",
+                    'cajero'  => "Location: ../Html/dashboardCajero.php?seccion=compras",
+                    default   => "Location: ../Html/Login.php?"
+                };
+                header($url);
+
                 exit;
             } else {
                 echo "<script>alert('Error al eliminar la compraa');</script>";
@@ -168,7 +234,17 @@
             unset($_SESSION['productosCompra']);
             $exito = "Compra cancelada y productos eliminados.";
         }
-        header("Location: ../Html/dashboardAdmi.php?seccion=compras&mensaje_cobro=2");
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $puesto = isset($_SESSION['puesto']) ? strtolower($_SESSION['puesto']) : '';
+
+        $url = match ($puesto) {
+            'gerente' => "Location: ../Html/dashboardAdmi.php?seccion=compras",
+            'cajero'  => "Location: ../Html/dashboardCajero.php?seccion=compras",
+            default   => "Location: ../Html/Login.php?"
+        };
+        header($url);
         exit;
         
     }
