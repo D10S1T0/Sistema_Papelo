@@ -1,7 +1,7 @@
 <div class="sidebar">
     <div class="sidebar-brand d-flex align-items-center">
         <i class="bi bi-shop me-2"></i>
-        <span>Panel Admin</span>
+        <a href="#" class="text-white text-decoration-none fs-3 fw-bold">PAPEL<span style="color: var(--secondary-color);">O</span></a>
     </div>
     <ul class="sidebar-nav">
         <li>
