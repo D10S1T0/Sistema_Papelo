@@ -82,13 +82,27 @@ try {
         exit;
     }
 
+     // Parámetros de paginación
+    $pagina = isset($_GET['pagina']) ? max(1, intval($_GET['pagina'])) : 1;
+    $productosPorPagina = 10; // Puedes ajustar este número
+    $offset = ($pagina - 1) * $productosPorPagina;
+
+    // Parámetros de filtros
     $buscar = $_GET['buscar'] ?? '';
     $categoria = $_GET['categoria'] ?? '';
     $orden = $_GET['orden'] ?? '';
-    $productos = obtenerProductosConFiltro($conexion, $buscar, $categoria, $orden);
+
+    // Obtener productos paginados
+    $productos = obtenerProductosConFiltroPaginados($conexion, $buscar, $categoria, $orden, $productosPorPagina, $offset);
+    
+    // Obtener total de productos para la paginación
+    $totalProductos = contarProductosConFiltro($conexion, $buscar, $categoria);
+    $totalPaginas = ceil($totalProductos / $productosPorPagina);
 
 } catch (Exception $e) {
     $productos = [];
+    $totalPaginas = 1;
+    $pagina = 1;
 }
 
 ?>

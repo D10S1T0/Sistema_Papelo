@@ -67,7 +67,31 @@
 		return $stmt->fetchAll(PDO::FETCH_ASSOC);
 	}
 
-	function obtenerProductosConFiltro($conexion, $buscar = '', $categoria = '', $orden = '') {
+	function contarProductosConFiltro($conexion, $buscar = '', $categoria = '') {
+		$sql = "SELECT COUNT(*) as total 
+				FROM Productos p 
+				JOIN Categorias c ON p.idCategoria = c.idCategoria 
+				WHERE 1=1";
+
+		$params = [];
+
+		if (!empty($buscar)) {
+			$sql .= " AND p.nombreProducto LIKE :buscar";
+			$params[':buscar'] = '%' . $buscar . '%';
+		}
+
+		if (!empty($categoria) && $categoria !== 'Todas las categorías') {
+			$sql .= " AND c.nombreCategoria = :categoria";
+			$params[':categoria'] = $categoria;
+		}
+
+		$stmt = $conexion->prepare($sql);
+		$stmt->execute($params);
+		$resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+		return $resultado['total'];
+	}
+
+	function obtenerProductosConFiltroPaginados($conexion, $buscar = '', $categoria = '', $orden = '', $limite = 10, $offset = 0) {
 		$sql = "SELECT p.*, c.nombreCategoria 
 				FROM Productos p 
 				JOIN Categorias c ON p.idCategoria = c.idCategoria 
@@ -96,15 +120,28 @@
 				$sql .= " ORDER BY p.stock DESC";
 				break;
 			default:
-				$sql .= " ORDER BY p.idProducto ASC"; // Orden por defecto
+				$sql .= " ORDER BY p.idProducto ASC";
 				break;
 		}
 
+		// Agregar paginación
+		$sql .= " LIMIT :limite OFFSET :offset";
+		
 		$stmt = $conexion->prepare($sql);
-		$stmt->execute($params);
-
+		
+		// Bind de parámetros de búsqueda
+		foreach ($params as $key => $value) {
+			$stmt->bindValue($key, $value);
+		}
+		
+		// Bind de parámetros de paginación
+		$stmt->bindValue(':limite', (int)$limite, PDO::PARAM_INT);
+		$stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+		
+		$stmt->execute();
 		return $stmt->fetchAll(PDO::FETCH_ASSOC);
 	}
+
 
 	function editarProducto($conexion, $datos, $imagenNueva = null) {
 		$sql = "UPDATE Productos SET 

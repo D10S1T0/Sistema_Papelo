@@ -127,7 +127,46 @@
                         </tr>
                     <?php endforeach; ?>
                     </tbody>
-                </table>
+                                </table>
+
+                <!-- Controles de paginación -->
+                <div class="d-flex justify-content-between align-items-center p-3 border-top">
+                    <div class="text-muted small">
+                        Mostrando <?= count($productos) ?> de <?= $totalProductos ?> productos
+                    </div>
+                    
+                    <nav aria-label="Paginación de productos">
+                        <ul class="pagination mb-0">
+                            <!-- Botón Anterior -->
+                            <li class="page-item <?= $pagina <= 1 ? 'disabled' : '' ?>">
+                                <a class="page-link" 
+                                   href="?<?= http_build_query(array_merge($_GET, ['pagina' => $pagina - 1])) ?>" 
+                                   aria-label="Anterior">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            
+                            <!-- Números de página -->
+                            <?php for ($i = 1; $i <= $totalPaginas; $i++): ?>
+                                <li class="page-item <?= $i == $pagina ? 'active' : '' ?>">
+                                    <a class="page-link" 
+                                       href="?<?= http_build_query(array_merge($_GET, ['pagina' => $i])) ?>">
+                                        <?= $i ?>
+                                    </a>
+                                </li>
+                            <?php endfor; ?>
+                            
+                            <!-- Botón Siguiente -->
+                            <li class="page-item <?= $pagina >= $totalPaginas ? 'disabled' : '' ?>">
+                                <a class="page-link" 
+                                   href="?<?= http_build_query(array_merge($_GET, ['pagina' => $pagina + 1])) ?>" 
+                                   aria-label="Siguiente">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
 
                 <!--borrar productos -->
                 <form id="formEliminarProducto" action="../Controladores/controlArticulos.php" method="POST" style="display: none;">
