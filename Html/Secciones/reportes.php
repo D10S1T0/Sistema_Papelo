@@ -7,6 +7,10 @@
             <i class="bi bi-download me-1"></i> Descargar
         </button>
     </div>
+    <button class="btn btn-outline-success" onclick="exportarReportesExcel()">
+        <i class="bi bi-file-earmark-spreadsheet"></i> Exportar Excel
+    </button>
+
 
 <div id="reporte">
     <br>    
@@ -292,3 +296,132 @@
         pdf.save("reporte_dashboard.pdf");
     }
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+
+<script>
+async function exportarReportesExcel() {
+
+    // ---------------------------------------------
+    //  DATOS NORMALES QUE YA RECIBES DE PHP
+    // ---------------------------------------------
+    const datos = <?= json_encode([
+        "ventasTotales"       => $ventasTotales,
+        "totalPedidos"        => $totalPedidos,
+        "articulosVendidos"   => $articulosVendidos,
+        "clientesNuevos"      => $clientesNuevos,
+        "pedidosRecientes"    => $pedidosRecientes ?: [],
+
+        // 🔹 Limpiar imágenes antes de enviarlas
+        "articulosMasPedidos" => array_map(function($p) {
+            unset($p["imagen"]);
+            return $p;
+        }, $articulosMasPedidos ?: []),
+
+        "mejorValorados" => array_map(function($p) {
+            unset($p["imagen"]);
+            return $p;
+        }, $mejorValorados ?: []),
+
+        "categoriasPopulares" => $categoriasPopulares ?: []
+    ]) ?>;
+
+
+    // ---------------------------------------------
+    //  CONSULTAS EXTRA (LLAMADA A PHP)
+    // ---------------------------------------------
+    const datosExtra = await fetch("/proyectos/Sistema%20Papelo/Controladores/exportarConsultasExtras.php")
+        .then(r => r.json())
+        .catch(err => {
+            console.error("Error al obtener datos extra:", err);
+            return {};
+        });
+
+
+    // ---------------------------------------------
+    //  CREAR EXCEL
+    // ---------------------------------------------
+    const wb = XLSX.utils.book_new();
+
+
+    // HOJA 1: RESUMEN
+    const resumen = [
+        ["Estadística", "Valor"],
+        ["Ventas Totales", datos.ventasTotales],
+        ["Total de Pedidos", datos.totalPedidos],
+        ["Artículos Vendidos", datos.articulosVendidos],
+        ["Clientes Nuevos", datos.clientesNuevos]
+    ];
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(resumen), "Resumen");
+
+
+    // HOJA 2: ARTÍCULOS MÁS PEDIDOS
+    XLSX.utils.book_append_sheet(
+        wb, 
+        XLSX.utils.json_to_sheet(datos.articulosMasPedidos), 
+        "Más Pedidos"
+    );
+
+    // HOJA 3: PRODUCTOS MEJOR VALORADOS
+    XLSX.utils.book_append_sheet(
+        wb, 
+        XLSX.utils.json_to_sheet(datos.mejorValorados), 
+        "Mejor Valorados"
+    );
+
+    // HOJA 4: CATEGORÍAS POPULARES
+    XLSX.utils.book_append_sheet(
+        wb, 
+        XLSX.utils.json_to_sheet(datos.categoriasPopulares), 
+        "Categorías Populares"
+    );
+
+
+    // ---------------------------------------------
+    //  HOJAS EXTRA DEL CONTROLADOR
+    // ---------------------------------------------
+    const hojasExtra = {
+        ventasPorDia: "Ventas por Día",
+        ventasPorMes: "Ventas por Mes",
+        ventasPorAño: "Ventas por Año",
+        ventasPorEmpleado: "Ventas por Empleado",
+        productosMasVendidos: "Productos Más Vendidos",
+        ventasPorCategoria: "Ventas por Categoría",
+        stockBajo: "Stock Bajo",
+        productosSinVender: "Productos sin Vender",
+        movimientosInventario: "Movimientos Inventario",
+        comprasPorProveedor: "Compras por Proveedor",
+        productosMasComprados: "Productos Más Comprados",
+        clientesTop: "Clientes que Más Compran",
+        pedidosPorEstado: "Pedidos por Estado",
+        pedidosPorCliente: "Pedidos por Cliente",
+        empleadosVentas: "Ventas por Empleado 2",
+        empleadosCompras: "Compras por Empleado",
+        productosMejorCalificados: "Productos Mejor Calificados",
+        productosMasCalificaciones: "Productos con Más Calificaciones",
+        productosPorCategoria: "Productos por Categoría",
+        proveedoresFrecuentes: "Proveedores Frecuentes",
+        productosPorProveedor: "Productos por Proveedor",
+        ingresosVentas: "Ingresos por Ventas",
+        gastosCompras: "Gastos por Compras",
+        clientesCalificadores: "Clientes que Califican",
+        productosCalifBaja: "Calificaciones Bajas"
+    };
+
+    for (const clave in hojasExtra) {
+        const nombreHoja = hojasExtra[clave];
+        const tabla = datosExtra[clave] || [];
+
+        XLSX.utils.book_append_sheet(
+            wb,
+            XLSX.utils.json_to_sheet(tabla),
+            nombreHoja.substring(0, 30) // límite Excel
+        );
+    }
+
+    // Descargar
+    XLSX.writeFile(wb, "Reportes_GestionPapeleria.xlsx");
+}
+</script>
+

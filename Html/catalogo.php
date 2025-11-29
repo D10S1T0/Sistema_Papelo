@@ -1,6 +1,5 @@
 <?php 
     session_start();
-    
     if (!isset($_SESSION['usuario']) || $_SESSION['tipo'] !== 'visitante') {
         header("Location: ../html/Login.php");
         exit();
@@ -14,7 +13,7 @@
     <title>Productos | Papelo</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="../Estilos/catalogo.css">    
+    <link rel="stylesheet" href="../Estilos/catalogo.css?v=1.1">    
 </head>
 <body>
     <?php include '../Includes/header.php';?>
@@ -33,10 +32,42 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
             </div>
         <?php endif; ?>
+		
+		<!-- Barra de búsqueda con diseño mejorado -->
+		<form id="formBusqueda" method="GET" action="../Controladores/controlCatalogo.php">
+			<div class="mb-5">
+				<div class="d-flex align-items-center justify-content-between mb-3">
+					<h2>Nuestros Productos</h2>
+					<div class="d-flex align-items-center gap-2">
+						<div class="input-group" style="width: 320px;">
+							<span class="input-group-text bg-white border-end-0">
+								<i class="bi bi-search"></i>
+							</span>
+							<input type="text" class="form-control border-start-0" name="buscar"
+								   placeholder="Buscar por nombre..."
+								   value="<?= isset($_GET['buscar']) ? htmlspecialchars($_GET['buscar']) : '' ?>">
+						</div>
+
+						<select class="form-select" name="categoria" id="selectCategoria" style="width: 220px;">
+							<option value="" <?= empty($_GET['categoria']) ? 'selected' : '' ?>>Todas las categorías</option>
+							<?php foreach ($categorias as $cat): ?>
+								<option value="<?= htmlspecialchars($cat['nombreCategoria']) ?>"
+									<?= ($_GET['categoria'] ?? '') === $cat['nombreCategoria'] ? 'selected' : '' ?>>
+									<?= htmlspecialchars($cat['nombreCategoria']) ?>
+								</option>
+							<?php endforeach; ?>
+						</select>
+
+						<button type="submit" class="btn btn-primary">
+							Buscar
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+
         
-        <h2 class="mb-4">Nuestros Productos</h2>
-        
-        <div class="row">
+		<div class="row">
             <?php foreach ($productos as $producto): ?>
                 <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
                     <div class="product-card">
@@ -68,57 +99,47 @@
             <?php endforeach; ?>
         </div>
         
-        <!--paginacion -->
+
+        
         <?php if ($totalPaginas > 1): ?>
-            <nav aria-label="Paginación de productos">
-                <ul class="pagination justify-content-center">
-                    <?php if ($paginaActual > 1): ?>
-                        <li class="page-item">
-                            <a class="page-link" href="?pagina=<?= $paginaActual - 1 ?>" aria-label="Anterior">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                    <?php endif; ?>
-
-                    <?php 
-                    $inicio = max(1, $paginaActual - 2);
-                    $fin = min($totalPaginas, $paginaActual + 2);
-
-                    if ($inicio > 1) {
-                        echo '<li class="page-item"><a class="page-link" href="?pagina=1">1</a></li>';
-                        if ($inicio > 2) {
-                            echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
-                        }
-                    }
-
-                    for ($i = $inicio; $i <= $fin; $i++): ?>
-                        <li class="page-item <?= $i == $paginaActual ? 'active' : '' ?>">
-                            <a class="page-link" href="?pagina=<?= $i ?>"><?= $i ?></a>
-                        </li>
-                    <?php endfor;
-
-                    if ($fin < $totalPaginas) {
-                        if ($fin < $totalPaginas - 1) {
-                            echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
-                        }
-                        echo '<li class="page-item"><a class="page-link" href="?pagina='.$totalPaginas.'">'.$totalPaginas.'</a></li>';
-                    }
-                    ?>
-
-                    <?php if ($paginaActual < $totalPaginas): ?>
-                        <li class="page-item">
-                            <a class="page-link" href="?pagina=<?= $paginaActual + 1 ?>" aria-label="Siguiente">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                    <?php endif; ?>
-                </ul>
-            </nav>
-        <?php endif; ?>
+			<nav class="mt-4">
+				<ul class="pagination justify-content-center">
+					<?php for ($i = 1; $i <= $totalPaginas; $i++): ?>
+						<li class="page-item <?= $i === $paginaActual ? 'active' : '' ?>">
+							<a class="page-link" href="?pagina=<?= $i ?>&buscar=<?= urlencode($buscar) ?>&categoria=<?= urlencode($categoria) ?>">
+								<?= $i ?>
+							</a>
+						</li>
+					<?php endfor; ?>
+				</ul>
+			</nav>
+		<?php endif; ?>
     </main>
     
     <?php include '../Includes/footer.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('formBusqueda');
+        const input = form.querySelector('input[name="buscar"]');
+        const select = document.getElementById('selectCategoria');
+
+        // Al presionar Enter en el input de búsqueda
+        input.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                form.submit();
+            }
+        });
+
+        // Al cambiar la categoría
+        select.addEventListener('change', function () {
+            form.submit();
+        });
+    });
+</script>
+
+
 </html>
