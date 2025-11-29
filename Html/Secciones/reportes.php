@@ -4,11 +4,11 @@
     <!--Btn descargaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-->
     <div class="btn-group">
         <button class="btn btn-outline-secondary" onclick="generarPDF()">
-            <i class="bi bi-download me-1"></i> Descargar
+            <i class="bi bi-download me-1"></i> Descargar PDF
         </button>
     </div>
     <button class="btn btn-outline-success" onclick="exportarReportesExcel()">
-        <i class="bi bi-file-earmark-spreadsheet"></i> Exportar Excel
+        <i class="bi bi-file-earmark-spreadsheet"></i> Descargar Excel
     </button>
 
 
